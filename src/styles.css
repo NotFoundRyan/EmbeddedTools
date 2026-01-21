@@ -797,7 +797,7 @@ canvas {
   right: 0;
 }
 
-.settings-panel {
+.settings-panel-overlay {
   position: fixed;
   top: 0;
   right: -400px;
@@ -811,7 +811,7 @@ canvas {
   flex-direction: column;
 }
 
-.settings-panel.open {
+.settings-panel-overlay.open {
   right: 0;
 }
 
