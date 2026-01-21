@@ -36,3 +36,7 @@ pnpm-debug.log*
 
 # OS
 Thumbs.db
+
+# Development files
+DEVELOPMENT.md
+README_RELEASES.md
