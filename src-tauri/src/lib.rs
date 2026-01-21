@@ -157,11 +157,11 @@ fn export_binary_file(path: String, data: Vec<u8>) -> Result<(), String> {
 }
 
 #[tauri::command]
-async fn check_for_updates(repo_owner: String, repo_name: String, current_version: String) -> Result<UpdateInfo, String> {
+async fn check_for_updates(repo_owner: String, _repo_name: String, current_version: String) -> Result<UpdateInfo, String> {
     let url = format!("https://api.github.com/repos/{}/releases/latest", repo_owner);
 
     let client = reqwest::Client::builder()
-        .user_agent("tauri-app")
+        .user_agent("EmbeddedTools")
         .build()
         .map_err(|e| e.to_string())?;
 
