@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>嵌入式开发工具箱</title>
+  </head>
+
+  <body>
+    <div class="splash-screen" id="splash-screen">
+      <div class="splash-content">
+        <div class="splash-logo">🔧</div>
+        <h1 class="splash-title">嵌入式开发工具箱</h1>
+        <div class="splash-status" id="splash-status">应用正在初始化中...</div>
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0%</div>
+      </div>
+    </div>
+
+    <div class="app-container" id="app-container">
+      <aside class="sidebar">
+        <div class="logo">
+          <h2>嵌入式工具箱</h2>
+        </div>
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tool="lcd">
+            <span class="icon">📺</span>
+            <span>LCD点阵生成</span>
+          </button>
+          <button class="nav-item" data-tool="serial">
+            <span class="icon">🔌</span>
+            <span>串口调试助手</span>
+          </button>
+        </nav>
+      </aside>
+
+      <button class="settings-toggle-btn" id="settings-toggle-btn">⚙️</button>
+
+      <main class="main-content">
+        <div id="lcd-tool" class="tool-panel active">
+          <h1>LCD点阵生成工具</h1>
+
+          <div class="input-mode-tabs">
+            <button class="tab-btn active" data-mode="image">图片模式</button>
+            <button class="tab-btn" data-mode="text">文字模式</button>
+          </div>
+
+          <div id="image-mode" class="mode-panel active">
+            <div class="settings-panel">
+              <div class="setting-group full-width">
+                <label for="image-upload">上传图片：</label>
+                <input type="file" id="image-upload" accept="image/*" />
+                <button id="load-image-btn" type="button">加载图片</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="text-mode" class="mode-panel">
+            <div class="settings-panel">
+              <div class="setting-group full-width">
+                <label for="text-input">输入文字：</label>
+                <input type="text" id="text-input" placeholder="输入中文或英文..." value="你好" />
+              </div>
+
+              <div class="setting-group">
+                <label for="font-family">字体：</label>
+                <select id="font-family">
+                  <option value="Microsoft YaHei">微软雅黑</option>
+                  <option value="SimHei">黑体</option>
+                  <option value="SimSun">宋体</option>
+                  <option value="KaiTi">楷体</option>
+                  <option value="Arial">Arial</option>
+                </select>
+              </div>
+
+              <div class="setting-group">
+                <label for="font-weight">字重：</label>
+                <select id="font-weight">
+                  <option value="normal">正常</option>
+                  <option value="bold">粗体</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-panel">
+            <div class="setting-group">
+              <label for="width-input">目标宽度：</label>
+              <input type="number" id="width-input" value="128" min="1" max="1920" />
+            </div>
+
+            <div class="setting-group">
+              <label for="height-input">目标高度：</label>
+              <input type="number" id="height-input" value="64" min="1" max="1920" />
+            </div>
+
+            <div class="setting-group">
+              <label for="font-size">字体大小：</label>
+              <input type="number" id="font-size" value="16" min="8" max="200" />
+            </div>
+
+            <div class="setting-group">
+              <label for="threshold">二值化阈值：</label>
+              <input type="range" id="threshold" min="0" max="255" value="128" />
+              <span id="threshold-value">128</span>
+            </div>
+
+            <div class="setting-group">
+              <label for="invert">反色：</label>
+              <input type="checkbox" id="invert" />
+            </div>
+
+            <div class="setting-group">
+              <label for="bit-depth">位深：</label>
+              <select id="bit-depth">
+                <option value="1" selected>1位 (黑白)</option>
+                <option value="2">2位 (4级灰度)</option>
+                <option value="4">4位 (16级灰度)</option>
+                <option value="8">8位 (256级灰度)</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="output-format">输出格式：</label>
+              <select id="output-format">
+                <option value="hex">十六进制数组</option>
+                <option value="binary">二进制数组</option>
+                <option value="c">C语言数组</option>
+                <option value="python">Python列表</option>
+                <option value="arduino">Arduino数组</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="byte-order">字节顺序：</label>
+              <select id="byte-order">
+                <option value="msb">MSB优先</option>
+                <option value="lsb">LSB优先</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button id="generate-btn">生成点阵</button>
+            <button id="export-btn">导出数据</button>
+            <button id="clear-btn">清空</button>
+          </div>
+
+          <div class="preview-panel">
+            <h2>预览</h2>
+            <div class="canvas-container">
+              <div class="canvas-wrapper">
+                <h3>原始图片</h3>
+                <canvas id="original-canvas"></canvas>
+              </div>
+              <div class="canvas-wrapper">
+                <h3>点阵预览</h3>
+                <canvas id="preview-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="output-panel">
+            <h2>输出数据</h2>
+            <textarea id="output-data" readonly></textarea>
+            <div class="output-info">
+              <span id="data-size">数据大小: 0 字节</span>
+              <span id="pixel-count">像素数量: 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="serial-tool" class="tool-panel">
+          <h1>串口调试助手</h1>
+
+          <div class="settings-panel">
+            <div class="setting-group">
+              <label for="serial-port">串口选择：</label>
+              <select id="serial-port">
+                <option value="">未选择串口</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="baud-rate">波特率：</label>
+              <select id="baud-rate">
+                <option value="1200">1200</option>
+                <option value="2400">2400</option>
+                <option value="4800">4800</option>
+                <option value="9600" selected>9600</option>
+                <option value="14400">14400</option>
+                <option value="19200">19200</option>
+                <option value="38400">38400</option>
+                <option value="57600">57600</option>
+                <option value="115200">115200</option>
+                <option value="230400">230400</option>
+                <option value="460800">460800</option>
+                <option value="921600">921600</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="data-bits">数据位：</label>
+              <select id="data-bits">
+                <option value="7">7</option>
+                <option value="8" selected>8</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="stop-bits">停止位：</label>
+              <select id="stop-bits">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="parity">校验位：</label>
+              <select id="parity">
+                <option value="none" selected>无</option>
+                <option value="even">偶校验</option>
+                <option value="odd">奇校验</option>
+              </select>
+            </div>
+
+            <div class="setting-group">
+              <label for="flow-control">流控：</label>
+              <select id="flow-control">
+                <option value="none" selected>无</option>
+                <option value="hardware">硬件流控</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button id="refresh-ports-btn">刷新串口</button>
+            <button id="open-serial-btn">打开串口</button>
+            <button id="close-serial-btn" disabled>关闭串口</button>
+          </div>
+
+          <div class="serial-status">
+            <span id="connection-status">状态: 未连接</span>
+            <span id="rx-tx-count">RX: 0 | TX: 0</span>
+          </div>
+
+          <div class="data-panel">
+            <div class="data-section">
+              <h2>发送数据</h2>
+              <div class="send-options">
+                <label>
+                  <input type="radio" name="send-format" value="text" checked />
+                  文本模式
+                </label>
+                <label>
+                  <input type="radio" name="send-format" value="hex" />
+                  十六进制
+                </label>
+                <label>
+                  <input type="checkbox" id="auto-send" />
+                  自动发送
+                </label>
+                <input type="number" id="send-interval" value="1000" min="100" max="10000" />
+                <span>ms</span>
+              </div>
+              <textarea id="send-data" placeholder="输入要发送的数据..."></textarea>
+              <div class="send-buttons">
+                <button id="send-btn">发送</button>
+                <button id="clear-send-btn">清空</button>
+              </div>
+            </div>
+
+            <div class="data-section">
+              <h2>接收数据</h2>
+              <div class="receive-options">
+                <label>
+                  <input type="checkbox" id="show-hex" />
+                  十六进制显示
+                </label>
+                <label>
+                  <input type="checkbox" id="show-time" />
+                  显示时间戳
+                </label>
+                <label>
+                  <input type="checkbox" id="auto-scroll" checked />
+                  自动滚动
+                </label>
+                <button id="clear-receive-btn">清空接收</button>
+              </div>
+              <div id="receive-data" class="receive-data"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="coming-soon-tool" class="tool-panel">
+          <h1>更多工具</h1>
+          <p>更多工具正在开发中...</p>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tauri-apps/api@2.1.1/dist/tauri.umd.min.js"></script>
+    <script src="app.js"></script>
+    <script src="lcd-tool.js"></script>
+    <script src="serial-tool.js"></script>
+  </body>
+</html>
