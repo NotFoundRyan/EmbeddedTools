@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>嵌入式开发工具箱</title>
+  </head>
+
+  <body>
+    <div class="splash-screen" id="splash-screen">
+      <div class="splash-content">
+        <div class="splash-logo">🔧</div>
+        <h1 class="splash-title">嵌入式开发工具箱</h1>
+        <div class="splash-status" id="splash-status">应用正在初始化中...</div>
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">0%</div>
+      </div>
+    </div>
+
+    <div class="app-container" id="app-container">
+      <aside class="sidebar">
+        <div class="logo">
+          <h2>嵌入式工具箱</h2>
+        </div>
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tool="lcd">
+            <span class="icon">📺</span>
+            <span>LCD点阵生成</span>
+          </button>
+          <button class="nav-item" data-tool="serial">
+            <span class="icon">🔌</span>
+            <span>串口调试助手</span>
+          </button>
+          <button class="nav-item" data-tool="timestamp">
+            <span class="icon">⏱️</span>
+            <span>时间戳转换</span>
+          </button>
+          <button class="nav-item" data-tool="onenet">
+            <span class="icon">🔑</span>
+            <span>OneNET Token</span>
+          </button>
+        </nav>
+      </aside>
+
+      <button class="settings-toggle-btn" id="settings-toggle-btn">⚙️</button>
+
+      <main class="main-content">
+        <div id="lcd-tool" class="tool-panel active">
+          <div class="lcd-app-container">
+            <header class="lcd-header">
+              <h1>LCD 点阵生成工具</h1>
+              <p>支持图片二值化、文字取模、多格式导出</p>
+            </header>
+
+            <div class="lcd-card input-section">
+              <div class="lcd-tabs">
+                <button class="lcd-tab-btn active" data-mode="image">图片模式</button>
+                <button class="lcd-tab-btn" data-mode="text">文字模式</button>
+              </div>
+
+              <div id="image-mode" class="lcd-mode-panel active">
+                <div class="upload-container">
+                  <input type="file" id="image-upload" accept="image/*" class="hidden-input" />
+                  <label for="image-upload" class="upload-box" id="drop-zone">
+                    <div class="upload-placeholder">
+                      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                      <p>点击或拖拽图片到此处</p>
+                      <span class="sub-text">支持 JPG, PNG, BMP</span>
+                    </div>
+                    <img id="upload-preview-img" class="upload-preview hidden" alt="预览" />
+                  </label>
+                </div>
+              </div>
+
+              <div id="text-mode" class="lcd-mode-panel">
+                <div class="form-grid">
+                  <div class="input-group full">
+                    <label>输入文字</label>
+                    <input type="text" id="text-input" placeholder="输入内容..." value="你好" />
+                  </div>
+                  <div class="input-group">
+                    <label>字体</label>
+                    <select id="font-family">
+                      <option value="Microsoft YaHei">微软雅黑</option>
+                      <option value="SimHei">黑体</option>
+                      <option value="SimSun">宋体</option>
+                      <option value="Arial">Arial</option>
+                      <option value="'Courier New'">Courier New</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label>字号 (px)</label>
+                    <input type="number" id="font-size" value="48" min="8" max="200" />
+                  </div>
+                  <div class="input-group">
+                    <label>字重</label>
+                    <select id="font-weight">
+                      <option value="normal">正常</option>
+                      <option value="bold">粗体</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="lcd-card settings-section">
+              <h3>参数配置</h3>
+              <div class="lcd-preset-row">
+                <label>预设分辨率</label>
+                <select id="preset-select" class="lcd-preset-select">
+                </select>
+              </div>
+              <div class="settings-grid">
+                <div class="input-group">
+                  <label>宽度 (Width)</label>
+                  <input type="number" id="width-input" value="128" min="1" max="1920" />
+                </div>
+                <div class="input-group">
+                  <label>高度 (Height)</label>
+                  <input type="number" id="height-input" value="64" min="1" max="1920" />
+                </div>
+                <div class="input-group">
+                  <label>二值化阈值<span id="threshold-value">128</span></label>
+                  <div class="range-wrap">
+                    <input type="range" id="threshold" min="0" max="255" value="128" />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>位深 (Bit Depth)</label>
+                  <select id="bit-depth">
+                    <option value="1">1位 (黑白)</option>
+                    <option value="2">2位 (4级灰度)</option>
+                    <option value="4">4位 (16级灰度)</option>
+                    <option value="8">8位 (灰度)</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label>输出格式</label>
+                  <select id="output-format">
+                    <option value="hex">十六进制 (Hex)</option>
+                    <option value="c">C语言数组</option>
+                    <option value="arduino">Arduino</option>
+                    <option value="python">Python列表</option>
+                    <option value="binary">二进制 (Binary)</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label>字节顺序</label>
+                  <select id="byte-order">
+                    <option value="msb">MSB 优先</option>
+                    <option value="lsb">LSB 优先</option>
+                  </select>
+                </div>
+                <div class="input-group toggle-group">
+                  <label for="invert">反色显示</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="invert" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-bar">
+              <button id="generate-btn" class="btn btn-primary">生成点阵数据</button>
+              <button id="clear-btn" class="btn btn-danger">重置</button>
+            </div>
+
+            <div class="split-view">
+              <div class="lcd-card preview-card">
+                <h3>效果预览</h3>
+                <div class="canvas-wrapper">
+                  <div class="canvas-item">
+                    <span class="label">原始图像</span>
+                    <div class="canvas-bg">
+                      <canvas id="original-canvas"></canvas>
+                    </div>
+                  </div>
+                  <div class="arrow">➜</div>
+                  <div class="canvas-item">
+                    <span class="label">取模结果</span>
+                    <div class="canvas-bg">
+                      <canvas id="preview-canvas"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="lcd-card code-card">
+                <div class="code-header">
+                  <h3>数据输出</h3>
+                  <div class="stats">
+                    <span id="pixel-count">0 像素</span>
+                    <span class="divider">|</span>
+                    <span id="data-size">0 字节</span>
+                    <button id="copy-output-btn" class="lcd-copy-btn" title="复制">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <textarea id="output-data" readonly spellcheck="false" placeholder="上传图片或输入文字后自动生成..."></textarea>
+              </div>
+            </div>
+
+            <div id="lcd-copy-toast" class="lcd-toast">已复制到剪贴板</div>
+          </div>
+        </div>
+
+        <div id="serial-tool" class="tool-panel">
+          <div class="serial-tool-wrapper">
+            <div class="serial-tool-header">
+              <div class="serial-tool-title">
+                <h1><i class="fa-solid fa-plug"></i> 串口调试助手</h1>
+              </div>
+              <div class="serial-tool-actions">
+                <button id="st-refresh-btn" class="serial-tool-btn serial-tool-btn-outline">
+                  <i class="fa-solid fa-rotate-right"></i> 刷新列表
+                </button>
+                <button id="st-add-btn" class="serial-tool-btn serial-tool-btn-primary">
+                  <i class="fa-solid fa-plus"></i> 添加串口
+                </button>
+              </div>
+            </div>
+
+            <div id="serial-tool-ports-container" class="serial-tool-ports-container">
+            </div>
+
+            <div id="st-empty-message" class="serial-tool-empty" style="display: block;">
+              <span class="serial-tool-empty-icon">🔌</span>
+              <p>暂无串口连接，请点击右上角添加。</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="timestamp-tool" class="tool-panel">
+          <div class="timestamp-tool-wrapper">
+            <div class="timestamp-tool-header">
+              <h1>⏱️ 时间戳转换工具</h1>
+              <p>实时显示当前时间戳，支持多种格式互转和多时区显示</p>
+            </div>
+
+            <div class="timestamp-live-panel">
+              <div class="timestamp-live-row">
+                <div class="timestamp-live-item">
+                  <div class="timestamp-live-label">当前时间戳</div>
+                  <div class="timestamp-live-value" id="live-timestamp">0</div>
+                  <div class="timestamp-live-unit">毫秒 (ms)</div>
+                </div>
+                <div class="timestamp-live-item">
+                  <div class="timestamp-live-label">本地时间</div>
+                  <div class="timestamp-live-value small" id="live-local-time">-</div>
+                </div>
+                <div class="timestamp-live-item">
+                  <div class="timestamp-live-label">UTC 时间</div>
+                  <div class="timestamp-live-value small" id="live-utc-time">-</div>
+                </div>
+                <div class="timestamp-live-item">
+                  <div class="timestamp-live-label" id="live-selected-tz-label">选择时区</div>
+                  <div class="timestamp-live-value small" id="live-selected-tz-time">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="timestamp-cards">
+              <div class="timestamp-card">
+                <h3>从时间戳转换</h3>
+                <div class="timestamp-input-group">
+                  <input type="number" id="timestamp-input" placeholder="输入时间戳..." />
+                  <select id="timestamp-unit">
+                    <option value="ms">毫秒 (ms)</option>
+                    <option value="s">秒 (s)</option>
+                  </select>
+                </div>
+                <div class="timestamp-btn-group">
+                  <button class="timestamp-btn timestamp-btn-primary" onclick="convertFromTimestamp()">
+                    <i class="fa-solid fa-arrow-right"></i> 转换
+                  </button>
+                  <button class="timestamp-btn timestamp-btn-outline" onclick="setCurrentTime()">
+                    <i class="fa-solid fa-clock"></i> 当前时间
+                  </button>
+                </div>
+                <div id="timestamp-error" class="timestamp-error"></div>
+              </div>
+
+              <div class="timestamp-card">
+                <h3>从日期时间转换</h3>
+                <div class="timestamp-datetime-group">
+                  <div class="datetime-field">
+                    <label>日期</label>
+                    <input type="date" id="date-input" />
+                  </div>
+                  <div class="datetime-field">
+                    <label>时间</label>
+                    <input type="time" id="time-input" step="1" />
+                  </div>
+                </div>
+                <div class="timestamp-btn-group">
+                  <button class="timestamp-btn timestamp-btn-primary" onclick="convertFromDate()">
+                    <i class="fa-solid fa-arrow-right"></i> 转换
+                  </button>
+                  <button class="timestamp-btn timestamp-btn-outline" onclick="setCurrentTime()">
+                    <i class="fa-solid fa-clock"></i> 当前时间
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="timestamp-card timestamp-results-card">
+              <h3>转换结果</h3>
+
+              <div class="timestamp-result-section">
+                <h4>标准格式</h4>
+                <div class="timestamp-result-grid">
+                  <div class="timestamp-result-item" onclick="copyToClipboard(document.getElementById('result-local').textContent)">
+                    <span class="result-label">本地时间</span>
+                    <span class="result-value" id="result-local">-</span>
+                    <i class="fa-regular fa-copy copy-icon"></i>
+                  </div>
+                  <div class="timestamp-result-item" onclick="copyToClipboard(document.getElementById('result-utc').textContent)">
+                    <span class="result-label">UTC 时间</span>
+                    <span class="result-value" id="result-utc">-</span>
+                    <i class="fa-regular fa-copy copy-icon"></i>
+                  </div>
+                  <div class="timestamp-result-item" onclick="copyToClipboard(document.getElementById('result-iso').textContent)">
+                    <span class="result-label">ISO 格式</span>
+                    <span class="result-value" id="result-iso">-</span>
+                    <i class="fa-regular fa-copy copy-icon"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timestamp-result-section">
+                <h4>Unix 时间戳</h4>
+                <div class="timestamp-result-grid">
+                  <div class="timestamp-result-item highlight" onclick="copyToClipboard(document.getElementById('result-unix-s').textContent)">
+                    <span class="result-label">秒 (s)</span>
+                    <span class="result-value" id="result-unix-s">-</span>
+                    <i class="fa-regular fa-copy copy-icon"></i>
+                  </div>
+                  <div class="timestamp-result-item highlight" onclick="copyToClipboard(document.getElementById('result-unix-ms').textContent)">
+                    <span class="result-label">毫秒 (ms)</span>
+                    <span class="result-value" id="result-unix-ms">-</span>
+                    <i class="fa-regular fa-copy copy-icon"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timestamp-result-section">
+                <h4>时区切换</h4>
+                <div id="timezone-selector" class="timezone-selector"></div>
+                <div class="timestamp-result-grid" style="margin-top: 12px;">
+                  <div class="timestamp-result-item highlight" onclick="copyToClipboard(document.getElementById('result-selected-tz').textContent)">
+                    <span class="result-label" id="result-selected-tz-name">选择时区</span>
+                    <span class="result-value" id="result-selected-tz">-</span>
+                    <i class="fa-regular fa-copy copy-icon"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="copy-toast" class="timestamp-toast">已复制到剪贴板</div>
+          </div>
+        </div>
+
+        <div id="onenet-tool" class="tool-panel">
+          <div class="onenet-tool-wrapper">
+            <div class="onenet-tool-header">
+              <h1>🔑 OneNET Token 生成器</h1>
+              <p>生成 OneNET 平台的鉴权 Token</p>
+            </div>
+
+            <div class="onenet-card">
+              <h3>参数配置</h3>
+              <div class="onenet-form-grid">
+                <div class="onenet-input-group full">
+                  <label>产品ID (Product ID)</label>
+                  <input type="text" id="onenet-product-id" placeholder="输入产品ID..." />
+                </div>
+                <div class="onenet-input-group full">
+                  <label>设备名称 (Device Name)</label>
+                  <input type="text" id="onenet-device-name" placeholder="输入设备名称..." />
+                </div>
+                <div class="onenet-input-group full">
+                  <label>Access Key</label>
+                  <input type="text" id="onenet-access-key" placeholder="输入Access Key..." />
+                </div>
+                <div class="onenet-input-group full">
+                  <label>过期时间 (ET)</label>
+                  <div class="onenet-et-row">
+                    <input type="datetime-local" id="onenet-et-datetime" step="1" />
+                    <div class="onenet-et-presets">
+                      <button type="button" class="onenet-et-preset-btn" onclick="setEtPreset(1)">1小时</button>
+                      <button type="button" class="onenet-et-preset-btn" onclick="setEtPreset(24)">1天</button>
+                      <button type="button" class="onenet-et-preset-btn" onclick="setEtPreset(168)">1周</button>
+                      <button type="button" class="onenet-et-preset-btn" onclick="setEtPreset(720)">1月</button>
+                    </div>
+                  </div>
+                  <div class="onenet-et-info">
+                    <span>时间戳: <strong id="onenet-et-timestamp">-</strong></span>
+                    <span>剩余: <strong id="onenet-et-remaining">-</strong></span>
+                  </div>
+                </div>
+                <div class="onenet-input-group">
+                  <label>算法</label>
+                  <select id="onenet-algorithm">
+                    <option value="sha256">SHA-256</option>
+                    <option value="sha1">SHA-1</option>
+                    <option value="md5">MD5</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="onenet-action-bar">
+              <button id="onenet-generate-btn" class="onenet-btn onenet-btn-primary">生成 Token</button>
+              <button id="onenet-clear-btn" class="onenet-btn onenet-btn-outline">重置</button>
+            </div>
+
+            <div class="onenet-card onenet-result-card">
+              <div class="onenet-result-header">
+                <h3>生成结果</h3>
+                <button id="onenet-copy-btn" class="onenet-copy-btn" title="复制">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+              <textarea id="onenet-result" readonly spellcheck="false" placeholder="配置参数后点击生成..."></textarea>
+            </div>
+
+            <div class="onenet-card onenet-history-section">
+              <div class="onenet-history-header">
+                <h4>历史记录</h4>
+                <button class="onenet-history-clear" onclick="clearHistory()">清空</button>
+              </div>
+              <div id="onenet-history-list" class="onenet-history-list">
+                <div class="onenet-history-empty">暂无历史记录</div>
+              </div>
+            </div>
+
+            <div id="onenet-copy-toast" class="onenet-toast">已复制到剪贴板</div>
+          </div>
+        </div>
+
+        <div id="coming-soon-tool" class="tool-panel">
+          <h1>更多工具</h1>
+          <p>更多工具正在开发中...</p>
+        </div>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="lcd-tool.js"></script>
+    <script src="serial-tool.js"></script>
+    <script src="timestamp-tool.js"></script>
+    <script src="onenet-tool.js"></script>
+  </body>
+</html>
