@@ -25,9 +25,12 @@ pnpm-debug.log*
 *.dll
 *.dylib
 *.so
+*.msi
+*.app
 
 # Logs
 *.log
+logs/
 
 # Environment
 .env
@@ -36,7 +39,23 @@ pnpm-debug.log*
 
 # OS
 Thumbs.db
+Desktop.ini
 
 # Development files
 DEVELOPMENT.md
 README_RELEASES.md
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Package manager locks (keep package-lock.json)
+# package-lock.json
+yarn.lock
+pnpm-lock.yaml

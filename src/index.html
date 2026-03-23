@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>嵌入式开发工具箱</title>
@@ -417,7 +417,12 @@
 
             <div class="onenet-action-bar">
               <button id="onenet-generate-btn" class="onenet-btn onenet-btn-primary">生成 Token</button>
+              <button id="onenet-verify-btn" class="onenet-btn onenet-btn-verify">验证连接</button>
               <button id="onenet-clear-btn" class="onenet-btn onenet-btn-outline">重置</button>
+            </div>
+
+            <div id="onenet-verify-result" class="onenet-verify-result" style="display: none;">
+              <div class="onenet-verify-content"></div>
             </div>
 
             <div class="onenet-card onenet-result-card">
@@ -451,10 +456,11 @@
       </main>
     </div>
 
-    <script src="app.js"></script>
-    <script src="lcd-tool.js"></script>
-    <script src="serial-tool.js"></script>
-    <script src="timestamp-tool.js"></script>
-    <script src="onenet-tool.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/tools/lcd-tool.js"></script>
+    <script src="scripts/tools/serial-tool.js"></script>
+    <script src="scripts/tools/timestamp-tool.js"></script>
+    <script src="scripts/tools/onenet-tool.js"></script>
   </body>
 </html>

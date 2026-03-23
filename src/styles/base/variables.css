@@ -1,0 +1,41 @@
+:root {
+  font-family: 'Microsoft YaHei', 'PingFang SC', 'SimHei', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #333;
+  background-color: #f0f2f5;
+
+  --primary: #374151;
+  --primary-hover: #1f2937;
+  --success: #10b981;
+  --danger: #ef4444;
+  --bg-page: #f3f4f6;
+  --bg-card: #ffffff;
+  --text-main: #1f2937;
+  --text-sub: #6b7280;
+  --border: #e5e7eb;
+  --radius: 8px;
+  --spacing: 20px;
+
+  --st-primary: #374151;
+  --st-primary-hover: #1f2937;
+  --st-success: #10b981;
+  --st-success-hover: #059669;
+  --st-danger: #ef4444;
+  --st-danger-hover: #dc2626;
+  --st-warning: #f59e0b;
+  --st-bg-main: #f3f4f6;
+  --st-bg-card: #ffffff;
+  --st-border: #e5e7eb;
+  --st-text-main: #1f2937;
+  --st-text-sub: #6b7280;
+  --st-terminal-bg: #111827;
+  --st-terminal-text: #a5f3fc;
+  --st-radius: 8px;
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-blur: blur(12px);
+}

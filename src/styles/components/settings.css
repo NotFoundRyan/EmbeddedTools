@@ -1,0 +1,266 @@
+.settings-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.settings-panel-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-panel-overlay .settings-content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 340px;
+  height: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  border-right: 1px solid var(--glass-border);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+}
+
+.settings-panel-overlay.open .settings-content {
+  transform: translateX(0);
+}
+
+.settings-panel-overlay .settings-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.settings-panel-overlay .settings-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.settings-panel-overlay .settings-section {
+  margin-bottom: 24px;
+  padding: 0 20px;
+}
+
+.settings-panel-overlay .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.settings-panel-overlay .section-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  flex: 1;
+}
+
+.settings-panel-overlay .settings-section h2 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.settings-panel-overlay .settings-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.settings-panel-overlay .setting-item {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.settings-panel-overlay .setting-item:last-child {
+  border-bottom: none;
+}
+
+.settings-panel-overlay .version-info,
+.settings-panel-overlay .author-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.settings-panel-overlay .version-info span:last-child,
+.settings-panel-overlay .author-info .author-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.settings-panel-overlay .check-update-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: #374151;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-panel-overlay .check-update-btn:hover:not(:disabled) {
+  background: #1f2937;
+  transform: translateY(-1px);
+}
+
+.settings-panel-overlay .check-update-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-panel-overlay .tech-stack ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-panel-overlay .tech-stack li {
+  padding: 6px 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.settings-panel-overlay .tech-stack li:last-child {
+  border-bottom: none;
+}
+
+.settings-panel-overlay .author-info {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.settings-panel-overlay .github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #24292e;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.settings-panel-overlay .github-link:hover {
+  background: #1a1e21;
+  transform: translateY(-1px);
+}
+
+.settings-panel-overlay .error-log-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.settings-panel-overlay #clear-error-log-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-panel-overlay #clear-error-log-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.settings-panel-overlay #clear-error-log-btn:active {
+  transform: translateY(0);
+}
+
+.settings-panel-overlay #error-log-content {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #1f2937;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+}
+
+.settings-panel-overlay .error-log-empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 20px 0;
+}
+
+.settings-panel-overlay .error-log-entry {
+  padding: 8px 0;
+  border-bottom: 1px solid #374151;
+  color: #e5e7eb;
+}
+
+.settings-panel-overlay .error-log-entry:last-child {
+  border-bottom: none;
+}
+
+.settings-panel-overlay .error-time {
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.settings-panel-overlay .error-message {
+  color: #fca5a5;
+  margin-bottom: 4px;
+}
+
+.settings-panel-overlay .error-source {
+  color: #6b7280;
+  font-size: 0.7rem;
+}
+
+.settings-panel-overlay #error-log-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settings-panel-overlay #error-log-content::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.settings-panel-overlay #error-log-content::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+}
+
+.settings-panel-overlay #error-log-content::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.settings-panel-overlay .hidden {
+  display: none !important;
+}

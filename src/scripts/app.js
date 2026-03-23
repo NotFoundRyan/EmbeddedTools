@@ -59,51 +59,71 @@ async function initApp() {
       errorLogContent.innerHTML = '<div class="error-log-empty">暂无错误日志</div>';
     }
 
+    const totalSteps = 6;
+    let currentStep = 0;
+
     const updateProgress = (progress, status) => {
-      progressBar.style.width = progress + '%';
-      progressText.textContent = progress + '%';
+      const actualProgress = Math.min(Math.max(progress, 0), 100);
+      progressBar.style.width = actualProgress + '%';
+      progressText.textContent = Math.round(actualProgress) + '%';
       splashStatus.textContent = status;
     };
 
-    updateProgress(20, '初始化应用...');
+    const runStep = async (stepName, action, progressValue) => {
+      currentStep++;
+      const progress = (currentStep / totalSteps) * 100;
+      updateProgress(progress, stepName);
 
-    initNavigation();
+      try {
+        await action();
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (error) {
+        console.error(`${stepName} 失败:`, error);
+        throw error;
+      }
+    };
 
-    updateProgress(40, '加载LCD工具...');
-    if (typeof initLCDTool === 'function') {
-      initLCDTool();
-    }
+    await runStep('初始化应用...', async () => {
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }, 16.67);
 
-    updateProgress(60, '加载串口工具...');
-    if (typeof initSerialTool === 'function') {
-      initSerialTool();
-    }
+    await runStep('加载导航系统...', async () => {
+      initNavigation();
+    }, 33.33);
 
-    updateProgress(70, '加载时间戳工具...');
-    if (typeof initTimestampTool === 'function') {
-      initTimestampTool();
-    }
+    await runStep('加载LCD工具...', async () => {
+      if (typeof initLCDTool === 'function') {
+        initLCDTool();
+      }
+    }, 50);
 
-    updateProgress(75, '加载OneNET工具...');
-    if (typeof initOnenetTool === 'function') {
-      initOnenetTool();
-    }
+    await runStep('加载串口工具...', async () => {
+      if (typeof initSerialTool === 'function') {
+        initSerialTool();
+      }
+    }, 66.67);
 
-    updateProgress(80, '完成初始化...');
+    await runStep('加载时间戳工具...', async () => {
+      if (typeof initTimestampTool === 'function') {
+        initTimestampTool();
+      }
+    }, 83.33);
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await runStep('加载OneNET工具...', async () => {
+      if (typeof initOnenetTool === 'function') {
+        initOnenetTool();
+      }
+    }, 100);
 
     updateProgress(100, '准备就绪');
-
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await new Promise(resolve => setTimeout(resolve, 200));
 
     splashScreen.classList.add('hidden');
     appContainer.classList.add('visible');
 
     setTimeout(() => {
       splashScreen.style.display = 'none';
-    }, 300);
-
+    }, 500);
   } catch (error) {
     console.error('初始化失败:', error);
     const splashStatus = document.getElementById('splash-status');
@@ -173,7 +193,7 @@ function openSettingsPanel() {
         <div class="setting-item">
           <div class="version-info">
             <span>当前版本: </span>
-            <span id="current-version">v0.2.0</span>
+            <span id="current-version">${getFullVersion()}</span>
           </div>
         </div>
         <div class="setting-item">
@@ -182,7 +202,7 @@ function openSettingsPanel() {
         <div class="setting-item">
           <div class="author-info">
             <span>作者: </span>
-            <span>Ryan Chen</span>
+            <span>${AppConfig.author}</span>
           </div>
         </div>
         <div class="setting-item">
@@ -289,34 +309,102 @@ async function checkForUpdates() {
   const originalText = checkUpdateBtn.textContent;
 
   try {
-    checkUpdateBtn.textContent = '检查中...';
+    checkUpdateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 检查中...';
     checkUpdateBtn.disabled = true;
 
-    const currentVersion = document.getElementById('current-version').textContent;
+    const currentVersion = getAppVersion();
 
     const tauri = getTauriAPI();
     if (!tauri) {
-      throw new Error('Tauri API 不可用');
+      throw new Error('Tauri API 不可用，请确保在应用环境中运行');
     }
 
-    const updateInfo = await tauri.core.invoke('check_for_updates', {
-      repoOwner: 'NotFoundRyan',
-      repoName: 'EmbeddedTools',
-      currentVersion: currentVersion
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    if (updateInfo.has_update) {
-      showUpdateDialog(updateInfo);
-    } else {
-      alert('当前已是最新版本');
+    try {
+      const updateInfo = await tauri.core.invoke('check_for_updates', {
+        repoOwner: AppConfig.repo.owner,
+        repoName: AppConfig.repo.name,
+        currentVersion: getFullVersion()
+      });
+
+      clearTimeout(timeoutId);
+
+      if (updateInfo.has_update) {
+        showUpdateDialog(updateInfo);
+      } else {
+        showToastMessage('当前已是最新版本，无需更新', 'success');
+      }
+    } catch (invokeError) {
+      clearTimeout(timeoutId);
+      throw invokeError;
     }
   } catch (error) {
-    logError('检查更新失败: ' + error, '系统');
-    alert('检查更新失败: ' + error);
+    let errorMessage = '检查更新失败';
+    if (error.message && error.message.includes('network')) {
+      errorMessage = '网络连接失败，请检查网络设置';
+    } else if (error.message && error.message.includes('timeout')) {
+      errorMessage = '请求超时，请稍后重试';
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    logError('检查更新失败: ' + errorMessage, '系统');
+    showToastMessage(errorMessage, 'error');
   } finally {
-    checkUpdateBtn.textContent = originalText;
+    checkUpdateBtn.innerHTML = originalText;
     checkUpdateBtn.disabled = false;
   }
+}
+
+function showToastMessage(message, type = 'info') {
+  const existingToast = document.querySelector('.app-toast-message');
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'app-toast-message';
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10001;
+    max-width: 80%;
+    text-align: center;
+  `;
+
+  if (type === 'success') {
+    toast.style.background = '#059669';
+    toast.style.color = 'white';
+  } else if (type === 'error') {
+    toast.style.background = '#dc2626';
+    toast.style.color = 'white';
+  } else {
+    toast.style.background = '#374151';
+    toast.style.color = 'white';
+  }
+
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  });
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 function showUpdateDialog(updateInfo) {

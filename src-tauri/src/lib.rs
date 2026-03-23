@@ -269,7 +269,8 @@ async fn check_for_updates(repo_owner: String, repo_name: String, current_versio
         .map_err(|e| e.to_string())?;
 
     let latest_version = release.tag_name.trim_start_matches('v').to_string();
-    let has_update = latest_version != current_version;
+    let current_ver = current_version.trim_start_matches('v').to_string();
+    let has_update = latest_version != current_ver;
 
     let download_url = if has_update {
         let asset = release.assets.iter().find(|a| a.name.ends_with("setup.exe"));

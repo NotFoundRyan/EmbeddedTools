@@ -17,6 +17,7 @@ function setupOnenetEventListeners() {
   const generateBtn = document.getElementById('onenet-generate-btn');
   const clearBtn = document.getElementById('onenet-clear-btn');
   const copyBtn = document.getElementById('onenet-copy-btn');
+  const verifyBtn = document.getElementById('onenet-verify-btn');
 
   if (productIdInput) {
     productIdInput.addEventListener('input', debounce(generateToken, 300));
@@ -47,6 +48,10 @@ function setupOnenetEventListeners() {
 
   if (copyBtn) {
     copyBtn.addEventListener('click', copyToken);
+  }
+
+  if (verifyBtn) {
+    verifyBtn.addEventListener('click', verifyConnection);
   }
 }
 
@@ -512,6 +517,106 @@ function clearHistory() {
   renderHistory();
 }
 
+async function verifyConnection() {
+  const productId = document.getElementById('onenet-product-id')?.value?.trim() || '';
+  const deviceName = document.getElementById('onenet-device-name')?.value?.trim() || '';
+  const accessKey = document.getElementById('onenet-access-key')?.value?.trim() || '';
+
+  const verifyBtn = document.getElementById('onenet-verify-btn');
+  const verifyResult = document.getElementById('onenet-verify-result');
+  const verifyContent = verifyResult?.querySelector('.onenet-verify-content');
+
+  if (!productId || !deviceName || !accessKey) {
+    showVerifyResult('error', '请填写所有必填项（产品ID、设备名称、Access Key）');
+    return;
+  }
+
+  if (verifyBtn) {
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 验证中...';
+  }
+
+  try {
+    const token = await generateToken();
+    if (!token) {
+      showVerifyResult('error', 'Token 生成失败，请检查参数');
+      return;
+    }
+
+    const apiUrl = `https://iot-api.heclouds.com/thingdevice/openapi/queryDeviceDetail?product_id=${encodeURIComponent(productId)}&device_name=${encodeURIComponent(deviceName)}`;
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (data.code === 0) {
+      const deviceInfo = data.data || {};
+      showVerifyResult('success', `
+        <div class="onenet-verify-success">
+          <div class="onenet-verify-title"><i class="fa-solid fa-check-circle"></i> 连接成功！</div>
+          <div class="onenet-verify-details">
+            <div class="onenet-verify-detail">
+              <span class="detail-label">产品ID:</span>
+              <span class="detail-value">${deviceInfo.product_id || productId}</span>
+            </div>
+            <div class="onenet-verify-detail">
+              <span class="detail-label">设备名称:</span>
+              <span class="detail-value">${deviceInfo.device_name || deviceName}</span>
+            </div>
+            <div class="onenet-verify-detail">
+              <span class="detail-label">设备状态:</span>
+              <span class="detail-value ${deviceInfo.status === 1 ? 'status-online' : 'status-offline'}">${deviceInfo.status === 1 ? '在线' : '离线'}</span>
+            </div>
+            ${deviceInfo.device_id ? `<div class="onenet-verify-detail">
+              <span class="detail-label">设备ID:</span>
+              <span class="detail-value">${deviceInfo.device_id}</span>
+            </div>` : ''}
+          </div>
+        </div>
+      `);
+    } else {
+      let errorMsg = '连接失败';
+      if (data.msg) {
+        errorMsg = data.msg;
+      } else if (data.code === 10) {
+        errorMsg = 'Token 无效或已过期';
+      } else if (data.code === 5) {
+        errorMsg = '设备不存在';
+      }
+      showVerifyResult('error', `<i class="fa-solid fa-times-circle"></i> ${errorMsg} (错误码: ${data.code})`);
+    }
+  } catch (error) {
+    console.error('Verify error:', error);
+    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      showVerifyResult('error', '<i class="fa-solid fa-times-circle"></i> 网络连接失败，请检查网络或使用代理');
+    } else {
+      showVerifyResult('error', `<i class="fa-solid fa-times-circle"></i> 验证失败: ${error.message}`);
+    }
+  } finally {
+    if (verifyBtn) {
+      verifyBtn.disabled = false;
+      verifyBtn.innerHTML = '验证连接';
+    }
+  }
+}
+
+function showVerifyResult(type, content) {
+  const verifyResult = document.getElementById('onenet-verify-result');
+  const verifyContent = verifyResult?.querySelector('.onenet-verify-content');
+
+  if (verifyResult && verifyContent) {
+    verifyResult.style.display = 'block';
+    verifyResult.className = `onenet-verify-result onenet-verify-${type}`;
+    verifyContent.innerHTML = content;
+  }
+}
+
 window.initOnenetTool = initOnenetTool;
 window.generateToken = generateToken;
 window.copyToken = copyToken;
@@ -519,3 +624,4 @@ window.loadFromHistory = loadFromHistory;
 window.deleteFromHistory = deleteFromHistory;
 window.clearHistory = clearHistory;
 window.setEtPreset = setEtPreset;
+window.verifyConnection = verifyConnection;

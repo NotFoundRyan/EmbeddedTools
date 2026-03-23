@@ -1,0 +1,24 @@
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .settings-toggle-btn {
+    bottom: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .settings-panel-overlay .settings-content {
+    width: 100%;
+  }
+}
